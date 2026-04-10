@@ -4,6 +4,8 @@
         :device-name="settings.deviceName"
         :status="settings.status"
         :mode="settings.mode"
+        :is-updating="isUpdatingMode"
+        @toggle-mode="handleToggleMode"
     />
 
     <SummaryCards :summary="summary" />
@@ -19,7 +21,7 @@ import SummaryCards from "../components/SummaryCards.vue";
 import DetectionList from "../components/DetectionList.vue";
 import { getRecentDetections } from "../services/detectionService";
 import { getTodaySummary } from "../services/analyticsService";
-import { getDeviceSettings } from "../services/settingsService";
+import { getDeviceSettings, updateDeviceMode } from "../services/settingsService";
 
 const detections = ref([]);
 
@@ -39,6 +41,8 @@ const settings = reactive({
   securityAlarmEnabled: false
 });
 
+const isUpdatingMode = ref(false);
+
 onMounted(async () => {
   try {
     const [recentDetections, todaySummary, deviceSettings] = await Promise.all([
@@ -55,6 +59,24 @@ onMounted(async () => {
     console.error("Failed to load dashboard data:", error);
   }
 });
+
+async function handleToggleMode() {
+  const newMode = settings.mode === "visitor" ? "security" : "visitor";
+
+  isUpdatingMode.value = true;
+
+  try {
+    await updateDeviceMode(newMode);
+
+    settings.mode = newMode;
+
+  } catch (error) {
+    console.error("Failed to update mode:", error);
+  } finally {
+    isUpdatingMode.value = false;
+  }
+}
+
 </script>
 
 <style scoped>

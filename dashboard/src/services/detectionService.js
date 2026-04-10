@@ -11,7 +11,7 @@ const DEVICE_ID = "doorwatch-main";
 
 export async function getRecentDetections() {
     const detectionsRef = collection(db, "devices", DEVICE_ID, "detections");
-    const q = query(detectionsRef, orderBy("timestamp", "desc"), limit(10));
+    const q = query(detectionsRef, orderBy("createdAt", "desc"), limit(10));
 
     const snapshot = await getDocs(q);
 

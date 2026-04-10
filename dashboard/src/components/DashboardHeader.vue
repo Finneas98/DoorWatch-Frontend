@@ -12,6 +12,13 @@
       <span class="mode-pill">
         Mode: {{ formattedMode }}
       </span>
+      <button
+          class="mode-button"
+          :disabled="isUpdating"
+          @click="toggleMode"
+      >
+        {{ isUpdating ? "Updating..." : toggleButtonLabel }}
+      </button>
     </div>
   </header>
 </template>
@@ -31,8 +38,14 @@ const props = defineProps({
   mode: {
     type: String,
     default: "visitor"
+  },
+  isUpdating: {
+    type: Boolean,
+    default: false
   }
 });
+
+const emit = defineEmits(["toggle-mode"]);
 
 const statusClass = computed(() =>
     props.status === "online" ? "online" : "offline"
@@ -45,6 +58,16 @@ const statusLabel = computed(() =>
 const formattedMode = computed(() =>
     props.mode.charAt(0).toUpperCase() + props.mode.slice(1)
 );
+
+const toggleButtonLabel = computed(() =>
+    props.mode === "visitor"
+        ? "Switch to Security Mode"
+        : "Switch to Visitor Mode"
+);
+
+function toggleMode() {
+  emit("toggle-mode");
+}
 </script>
 
 <style scoped>
@@ -94,5 +117,26 @@ h1 {
 .mode-pill {
   background: #eef2ff;
   color: #2c3e91;
+}
+
+.mode-button {
+  padding: 0.55rem 1rem;
+  border: none;
+  border-radius: 999px;
+  background: #2c3e91;
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.mode-button:hover:not(:disabled) {
+  background: #1f2d6b;
+}
+
+.mode-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 </style>
